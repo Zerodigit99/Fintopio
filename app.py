@@ -532,11 +532,7 @@ if __name__ == '__main__':
             f"{Fore.CYAN + Style.BRIGHT}[ Use 'queries.txt' Without Splitting ]{Style.RESET_ALL}"
         )
 
-        initial_choice = int(input(
-            f"{Fore.BLUE + Style.BRIGHT}[ {datetime.now().astimezone().strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-            f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-            f"{Fore.YELLOW + Style.BRIGHT}[ Select An Option ]{Style.RESET_ALL}"
-            f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+        initial_choice = int(os.getenv("INITIAL_CHOICE", 3))
         ))
         if initial_choice == 1:
             accounts = int(input(
