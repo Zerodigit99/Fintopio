@@ -4,3 +4,4 @@ colorama==0.4.6
 fake-useragent==1.5.1
 Faker==28.4.1
 aiogram
+python-telegram-bot==20.3
