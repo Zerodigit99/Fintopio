@@ -533,7 +533,7 @@ if __name__ == '__main__':
         )
 
         initial_choice = int(os.getenv("INITIAL_CHOICE", 3))
-        ))
+    
         if initial_choice == 1:
             accounts = int(input(
                 f"{Fore.YELLOW + Style.BRIGHT}[ How Much Account That You Want To Process Each Terminal ]{Style.RESET_ALL}"
