@@ -67,12 +67,22 @@ class YourScript:
         except Exception as e:
             await self.notify_telegram_bot(update, f"Error while claiming farming: {str(e)}")
 
-    async def start_farming_process(self, update: Update, context: CallbackContext):
-        """Command handler to start the farming process."""
-        await update.message.reply_text("Starting the farming process!")
+    async def request_query_id(self, update: Update, context: CallbackContext):
+        """Handle the query ID provided by the user."""
+        query_id = update.message.text
+        await update.message.reply_text(f"Received query ID: {query_id}. Starting the farming process!")
+        
+        # Use the query_id with your token and start the farming process
         token = "your_token_here"  # Replace with dynamic token input or loading
         farmed = 100  # Replace with actual farmed data
         await self.claim_farming(token, farmed, update)
+
+    async def start_farming_process(self, update: Update, context: CallbackContext):
+        """Command handler to start the farming process."""
+        await update.message.reply_text("Please send your query ID to start the farming process.")
+
+        # Set up a handler to capture the next message as the query ID
+        context.bot.add_handler(MessageHandler(Filters.text & ~Filters.command, self.request_query_id))
 
     async def stop_farming_process(self, update: Update, context: CallbackContext):
         """Command handler to stop the farming process."""
