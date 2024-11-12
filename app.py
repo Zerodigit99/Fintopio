@@ -9,6 +9,8 @@ from aiohttp import (
 )
 from urllib.parse import parse_qs
 import asyncio, json, os, re, sys
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
 class Fintopio:
     def __init__(self) -> None:
