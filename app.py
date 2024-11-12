@@ -81,7 +81,7 @@ class YourScript:
     
     def start_bot(self):
         """Initialize and start the Telegram bot."""
-        updater = Updater("YOUR_BOT_API_TOKEN", use_context=True)  # Replace with your token
+        updater = Updater("7712603902:AAHGFpU5lAQFuUUPYlM1jbu1u6XJGgs15Js", use_context=True)  # Replace with your token
         dispatcher = updater.dispatcher
 
         # Add command handlers
