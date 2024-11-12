@@ -12,6 +12,86 @@ import asyncio, json, os, re, sys
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
+class YourScript:
+    def __init__(self):
+        self.headers = {'User-Agent': 'Mozilla/5.0'}
+        
+    async def notify_telegram_bot(self, update: Update, message: str):
+        """Notify the user in Telegram."""
+        try:
+            await update.message.reply_text(message)
+        except Exception as e:
+            print(f"Error sending message: {str(e)}")
+    
+    async def farm_farming(self, token: str, farmed: int, update: Update):
+        url = 'https://fintopio-tg.fintopio.com/api/farming'
+        headers = {
+            **self.headers,
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+        try:
+            async with ClientSession(timeout=ClientTimeout(total=20)) as session:
+                async with session.get(url=url, headers=headers) as response:
+                    if response.status == 200:
+                        farming_data = await response.json()
+                        if farming_data['state'] == 'idle':
+                            await update.message.reply_text("Farming completed!")
+                        else:
+                            await update.message.reply_text("Farming still in progress.")
+                    else:
+                        await update.message.reply_text("Error with farming data.")
+        except Exception as e:
+            await update.message.reply_text(f"Error while farming: {str(e)}")
+
+    async def claim_farming(self, token: str, farmed: int, update: Update):
+        url = 'https://fintopio-tg.fintopio.com/api/farming/claim'
+        headers = {
+            **self.headers,
+            'Authorization': f'Bearer {token}',
+            'Content-Length': '0',
+            'Content-Type': 'application/json'
+        }
+        try:
+            async with ClientSession(timeout=ClientTimeout(total=20)) as session:
+                async with session.post(url=url, headers=headers) as response:
+                    if response.status == 400:
+                        error_claim_farming = await response.json()
+                        if error_claim_farming['message'] == 'Farming is not finished yet':
+                            return await self.notify_telegram_bot(update, "Farming is not finished yet.")
+                    response.raise_for_status()
+                    claim_farming = await response.json()
+                    if claim_farming['state'] == 'idling':
+                        await self.notify_telegram_bot(update, f"You've got {farmed} from farming.")
+                        return await self.farm_farming(token=token, farmed=farmed, update=update)
+        except Exception as e:
+            await self.notify_telegram_bot(update, f"Error while claiming farming: {str(e)}")
+
+    async def start_farming_process(self, update: Update, context: CallbackContext):
+        """Command handler to start the farming process."""
+        await update.message.reply_text("Starting the farming process!")
+        token = "your_token_here"  # Replace with dynamic token input or loading
+        farmed = 100  # Replace with actual farmed data
+        await self.claim_farming(token, farmed, update)
+
+    async def stop_farming_process(self, update: Update, context: CallbackContext):
+        """Command handler to stop the farming process."""
+        await update.message.reply_text("Stopping the farming process!")
+        # Stop any ongoing tasks here (this can be handled with flags or similar)
+    
+    def start_bot(self):
+        """Initialize and start the Telegram bot."""
+        updater = Updater("YOUR_BOT_API_TOKEN", use_context=True)  # Replace with your token
+        dispatcher = updater.dispatcher
+
+        # Add command handlers
+        dispatcher.add_handler(CommandHandler("start", self.start_farming_process))
+        dispatcher.add_handler(CommandHandler("stop", self.stop_farming_process))
+
+        # Start polling for updates
+        updater.start_polling()
+        updater.idle()
+        
 class Fintopio:
     def __init__(self) -> None:
         self.faker = Faker()
@@ -504,3 +584,7 @@ if __name__ == '__main__':
         fintopio.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ {str(e)} ]{Style.RESET_ALL}")
     except KeyboardInterrupt:
         sys.exit(0)
+
+if __name__ == '__main__':
+    bot_script = YourScript()
+    bot_script.start_bot()
